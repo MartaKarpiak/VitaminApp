@@ -1,0 +1,56 @@
+<div class="container mt-5">
+
+    <h2 class="mb-4 text-center">Search Results</h2>
+
+    <div class="row">
+
+        <!-- PRODUCTS -->
+        <div class="col-md-6">
+            <h4 class="mb-3">🥦 Products</h4>
+
+            @if (ViewBag.Products != null && ViewBag.Products.Count > 0)
+            {
+                @foreach (var p in ViewBag.Products)
+                {
+                    <div class="card mb-2 shadow-sm p-2">
+                        @p.Name
+                    </div>
+                }
+            }
+            else
+            {
+                <p>No products found</p>
+            }
+        </div>
+
+        <!-- DISHES -->
+        <div class="col-md-6">
+            <h4 class="mb-3">🍲 Dishes</h4>
+
+            @if (ViewBag.Dishes != null && ViewBag.Dishes.Count > 0)
+            {
+                @foreach (var d in ViewBag.Dishes)
+                {
+                    <div class="card mb-3 shadow p-3">
+                        <h5>@d.Name</h5>
+                        <p class="text-muted">@d.Recipe</p>
+
+                        <button class="btn btn-outline-danger btn-sm mt-2">
+                            ❤️ Add to favorites
+                        </button>
+                    </div>
+                }
+            }
+            else
+            {
+                <p>No dishes found</p>
+            }
+        </div>
+
+    </div>
+
+    <div class="text-center">
+        <a href="/Food" class="btn btn-secondary mt-4">← Back</a>
+    </div>
+
+</div>
