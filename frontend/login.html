@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вхід — Vitamin App</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #e8fff3, #eef5ff);
+            color: #0f172a;
+        }
+
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 25px;
+        }
+
+        .auth-section {
+            width: 100%;
+            max-width: 460px;
+            background: white;
+            border-radius: 28px;
+            padding: 35px;
+            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.12);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .logo span {
+            display: inline-block;
+            padding: 10px 16px;
+            border-radius: 999px;
+            background: #dcfce7;
+            color: #166534;
+            font-weight: 800;
+        }
+
+        h2 {
+            text-align: center;
+            margin: 0 0 8px;
+            font-size: 30px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 28px;
+        }
+
+        fieldset {
+            border: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        legend {
+            display: none;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 7px;
+            color: #334155;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 15px;
+            border-radius: 15px;
+            border: 1px solid #cbd5e1;
+            font-size: 15px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #10b981;
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+        }
+
+        .helper-link {
+            text-align: right;
+            margin-top: -6px;
+            margin-bottom: 18px;
+        }
+
+        .helper-link a,
+        .auth-switch a {
+            color: #0d9488;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #16a34a, #0d9488);
+            color: white;
+            font-size: 17px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 28px rgba(13, 148, 136, 0.28);
+        }
+
+        .auth-switch {
+            text-align: center;
+            margin-top: 22px;
+            color: #64748b;
+        }
+
+        .alert {
+            padding: 13px 15px;
+            border-radius: 15px;
+            margin-bottom: 18px;
+            font-weight: 600;
+        }
+
+        .alert-success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #86efac;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .back-home {
+            text-align: center;
+            margin-top: 18px;
+        }
+
+        .back-home a {
+            color: #64748b;
+            text-decoration: none;
+            font-weight: 700;
+        }
+    </style>
+</head>
+
+<body>
+<main class="auth-container">
+    <section class="auth-section">
+        <div class="logo">
+            <span>Vitamin App</span>
+        </div>
+
+        <h2>Вхід до системи</h2>
+        <p class="subtitle">Увійди, щоб отримати персональний план харчування.</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages-container">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <form action="{{ url_for('auth.login') }}" method="POST" id="loginForm">
+            <fieldset>
+                <legend>Дані для входу</legend>
+
+                <div class="form-group">
+                    <label for="login-username">Логін</label>
+                    <input type="text" id="login-username" name="login" required autocomplete="username">
+                </div>
+
+                <div class="form-group">
+                    <label for="login-password">Пароль</label>
+                    <input type="password" id="login-password" name="password" required autocomplete="current-password">
+                </div>
+
+                <div class="helper-link">
+                    <a href="{{ url_for('auth.forgot_password') }}">Забули пароль?</a>
+                </div>
+
+                <button type="submit" class="btn-submit">Увійти</button>
+            </fieldset>
+        </form>
+
+        <div class="auth-switch">
+            <p>Немає облікового запису? <a href="{{ url_for('auth.register') }}">Зареєструватися</a></p>
+        </div>
+
+        <div class="back-home">
+    <a href="/">← На головну</a>
+</div>
+    </section>
+</main>
+</body>
+</html>

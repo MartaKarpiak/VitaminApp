@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Підтвердження коду — Vitamin App</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #e8fff3, #eef5ff);
+            color: #0f172a;
+        }
+
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 25px;
+        }
+
+        .auth-section {
+            width: 100%;
+            max-width: 540px;
+            background: white;
+            border-radius: 28px;
+            padding: 35px;
+            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.12);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .logo span {
+            display: inline-block;
+            padding: 10px 16px;
+            border-radius: 999px;
+            background: #dcfce7;
+            color: #166534;
+            font-weight: 800;
+        }
+
+        h2 {
+            text-align: center;
+            margin: 0 0 10px;
+            font-size: 30px;
+        }
+
+        .auth-description {
+            text-align: center;
+            color: #64748b;
+            line-height: 1.6;
+            margin-bottom: 28px;
+        }
+
+        .auth-description strong {
+            color: #0d9488;
+        }
+
+        fieldset {
+            border: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        legend {
+            display: none;
+        }
+
+        .form-group {
+            margin-bottom: 17px;
+        }
+
+        label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 7px;
+            color: #334155;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 15px;
+            border-radius: 15px;
+            border: 1px solid #cbd5e1;
+            font-size: 15px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #10b981;
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+        }
+
+        #reset-code {
+            text-align: center;
+            letter-spacing: 7px;
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #16a34a, #0d9488);
+            color: white;
+            font-size: 17px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.2s ease;
+            margin-top: 5px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 28px rgba(13, 148, 136, 0.28);
+        }
+
+        .auth-switch {
+            text-align: center;
+            margin-top: 22px;
+            color: #64748b;
+        }
+
+        .auth-switch a {
+            color: #0d9488;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .alert {
+            padding: 13px 15px;
+            border-radius: 15px;
+            margin-bottom: 18px;
+            font-weight: 600;
+        }
+
+        .alert-success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #86efac;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .back-home {
+            text-align: center;
+            margin-top: 18px;
+        }
+
+        .back-home a {
+            color: #64748b;
+            text-decoration: none;
+            font-weight: 700;
+        }
+    </style>
+</head>
+
+<body>
+
+<main class="auth-container">
+    <section class="auth-section">
+
+        <div class="logo">
+            <span>Vitamin App</span>
+        </div>
+
+        <h2>Підтвердження коду</h2>
+
+        <p class="auth-description">
+            Ми надіслали 6-значний код на адресу
+            <strong>{{ email }}</strong>.
+            Код дійсний протягом 5 хвилин.
+        </p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages-container">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <form action="/verify-reset-code" method="POST" id="verifyCodeForm">
+            <fieldset>
+                <legend>Створення нового пароля</legend>
+
+                <input type="hidden" name="email" value="{{ email }}">
+
+                <div class="form-group">
+                    <label for="reset-code">6-значний код</label>
+                    <input
+                        type="text"
+                        id="reset-code"
+                        name="code"
+                        required
+                        maxlength="6"
+                        pattern="\d{6}"
+                        placeholder="123456"
+                        autocomplete="off"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="new-password">Новий пароль</label>
+                    <input
+                        type="password"
+                        id="new-password"
+                        name="new_password"
+                        required
+                        autocomplete="new-password"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="new-password-confirm">Повторіть новий пароль</label>
+                    <input
+                        type="password"
+                        id="new-password-confirm"
+                        name="password_confirm"
+                        required
+                        autocomplete="new-password"
+                    >
+                </div>
+
+                <button type="submit" class="btn-submit">
+                    Змінити пароль
+                </button>
+            </fieldset>
+        </form>
+
+        <div class="auth-switch">
+            <p>
+                Не отримали лист?
+                <a href="/forgot-password">
+                    Запитати код ще раз
+                </a>
+            </p>
+        </div>
+
+        <div class="back-home">
+            <a href="/">
+                ← На головну
+            </a>
+        </div>
+
+    </section>
+</main>
+
+</body>
+</html>

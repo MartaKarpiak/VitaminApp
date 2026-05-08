@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель керування — Vitamin App</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: linear-gradient(135deg, #e8fff3, #eef5ff);
+            color: #1f2937;
+        }
+
+        .dashboard-container {
+            max-width: 1100px;
+            margin: 35px auto;
+            padding: 25px;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #22c55e, #14b8a6);
+            color: white;
+            padding: 35px;
+            border-radius: 28px;
+            box-shadow: 0 18px 40px rgba(20, 184, 166, 0.25);
+            margin-bottom: 25px;
+        }
+
+        .hero h1 {
+            margin: 0 0 10px;
+            font-size: 34px;
+        }
+
+        .hero p {
+            margin: 0;
+            font-size: 17px;
+            opacity: 0.95;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 24px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+        }
+
+        .alert {
+            padding: 14px 18px;
+            border-radius: 16px;
+            margin-bottom: 18px;
+            font-weight: 500;
+        }
+        .dish-reason {
+    margin-top: 6px;
+    font-size: 13px;
+    color: #64748b;
+    line-height: 1.4;
+}
+
+        .alert-success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #86efac;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        h2, h3 {
+            color: #0f172a;
+        }
+
+        .targets-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 14px;
+            padding: 0;
+            list-style: none;
+        }
+
+        .target-item {
+            background: #f8fafc;
+            border-radius: 18px;
+            padding: 16px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .target-item strong {
+            display: block;
+            color: #059669;
+            margin-bottom: 4px;
+        }
+
+        .menu-table {
+            width: 100%;
+            border-collapse: collapse;
+            overflow: hidden;
+            border-radius: 18px;
+            background: white;
+            margin-top: 15px;
+        }
+
+        .menu-table th {
+            background: #10b981;
+            color: white;
+            padding: 13px;
+            text-align: left;
+        }
+
+        .menu-table td {
+            padding: 13px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .menu-table tr:last-child {
+            background: #ecfdf5;
+            font-weight: 700;
+        }
+
+        details {
+            margin-bottom: 25px;
+        }
+
+        summary {
+            cursor: pointer;
+            font-weight: 700;
+            color: #0f766e;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .settings-form fieldset {
+            border: none;
+            background: #f8fafc;
+            border-radius: 22px;
+            padding: 22px;
+            margin-bottom: 22px;
+        }
+
+        .settings-form legend {
+            font-weight: 800;
+            color: #0f172a;
+            font-size: 20px;
+            padding: 0 6px;
+        }
+
+        .hint {
+            font-size: 14px;
+            color: #64748b;
+            margin-top: 5px;
+            margin-bottom: 18px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+            margin-bottom: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #334155;
+        }
+
+        input[type="number"],
+        select {
+            padding: 12px 14px;
+            border-radius: 14px;
+            border: 1px solid #cbd5e1;
+            font-size: 15px;
+            outline: none;
+            background: white;
+        }
+
+        input[type="number"]:focus,
+        select:focus {
+            border-color: #10b981;
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+        .recommendation-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin: 18px 0 30px;
+}
+
+.recommendation-card {
+    background: #f8fafc;
+    border: 1px solid #dbeafe;
+    border-radius: 20px;
+    padding: 18px;
+}
+
+.recommendation-card h4 {
+    margin: 0 0 12px;
+    color: #059669;
+    font-size: 18px;
+}
+
+.recommendation-card ul {
+    margin: 0;
+    padding-left: 18px;
+}
+
+.recommendation-card li {
+    margin-bottom: 7px;
+    color: #334155;
+}
+
+        .option-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 12px;
+        }
+
+        .checkbox-group {
+            position: relative;
+        }
+
+        .checkbox-group input {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .checkbox-group label {
+            display: block;
+            padding: 13px 15px;
+            border-radius: 16px;
+            background: white;
+            border: 1px solid #dbeafe;
+            cursor: pointer;
+            font-weight: 600;
+            color: #334155;
+            transition: 0.2s ease;
+        }
+
+        .checkbox-group label:hover {
+            transform: translateY(-2px);
+            border-color: #34d399;
+            box-shadow: 0 8px 18px rgba(16, 185, 129, 0.13);
+        }
+
+        .checkbox-group input:checked + label {
+            background: linear-gradient(135deg, #10b981, #14b8a6);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 10px 22px rgba(20, 184, 166, 0.25);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 15px 22px;
+            background: linear-gradient(135deg, #16a34a, #0d9488);
+            color: white;
+            border: none;
+            border-radius: 18px;
+            font-size: 17px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 28px rgba(13, 148, 136, 0.28);
+        }
+
+        .logout {
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        .logout a {
+            color: #dc2626;
+            text-decoration: none;
+            font-weight: 800;
+        }
+
+        .empty-message {
+            color: #dc2626;
+            font-weight: 700;
+            background: #fef2f2;
+            padding: 15px;
+            border-radius: 16px;
+            border: 1px solid #fecaca;
+        }
+
+        @media (max-width: 600px) {
+            .dashboard-container {
+                padding: 14px;
+                margin: 10px auto;
+            }
+
+            .hero {
+                padding: 24px;
+            }
+
+            .hero h1 {
+                font-size: 26px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<main class="dashboard-container">
+
+    <header class="hero">
+        <h1>Вітаємо, {{ user.username }}!</h1>
+        <p>Тут ти можеш налаштувати свій профіль, обрати дефіцити нутрієнтів і отримати персональний план харчування.</p>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages-container">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    {% if user_details and targets %}
+        <section class="card">
+            <h2>Твій план харчування</h2>
+
+            <h3>Цільові показники на день</h3>
+            <ul class="targets-list">
+                <li class="target-item">
+                    <strong>Енергія</strong>
+                    {{ targets.tdee_kcal }} ккал
+                </li>
+                <li class="target-item">
+                    <strong>Білки</strong>
+                    {{ targets.macros.protein_g }} г
+                </li>
+                <li class="target-item">
+                    <strong>Жири</strong>
+                    {{ targets.macros.fat_g }} г
+                </li>
+                <li class="target-item">
+                    <strong>Вуглеводи</strong>
+                    {{ targets.macros.carbs_g }} г
+                </li>
+                <li class="target-item">
+    <strong>Мікронутрієнти</strong>
+    A: {{ targets.micronutrients.vit_a_mcg }} мкг |
+    C: {{ targets.micronutrients.vit_c_mg }} мг |
+    D: {{ targets.micronutrients.vit_d_mcg }} мкг |
+    E: {{ targets.micronutrients.vit_e_mg }} мг |
+    K: {{ targets.micronutrients.vit_k_mcg }} мкг |
+    B1: {{ targets.micronutrients.vit_b1_mg }} мг |
+    B2: {{ targets.micronutrients.vit_b2_mg }} мг |
+    B6: {{ targets.micronutrients.vit_b6_mg }} мг |
+    B12: {{ targets.micronutrients.vit_b12_mcg }} мкг |
+    Fe: {{ targets.micronutrients.iron_mg }} мг |
+    Ca: {{ targets.micronutrients.calcium_mg }} мг |
+    Mg: {{ targets.micronutrients.magnesium_mg }} мг |
+    Zn: {{ targets.micronutrients.zinc_mg }} мг
+</li>
+            </ul>
+            {% if product_recommendations %}
+    <h3>Рекомендовані продукти за вибраними дефіцитами</h3>
+
+    <div class="recommendation-grid">
+        {% for nutrient_name, data in product_recommendations.items() %}
+            <div class="recommendation-card">
+                <h4>{{ nutrient_name }}</h4>
+
+                <ul>
+                    {% for product in data.products %}
+                        <li>
+                            <strong>{{ product.name }}</strong>
+                            —
+                            {{ product | attr(data.field) | round(1) }}
+                            {{ data.unit }} / 100 г
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+            {% if best_menu %}
+                <h3>Згенероване меню</h3>
+
+                <table class="menu-table">
+                    <thead>
+                    <tr>
+                        <th>Страва</th>
+                        <th>Ккал</th>
+                        <th>Білки</th>
+                        <th>Жири</th>
+                        <th>Вуглеводи</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% set total_kcal = namespace(value=0) %}
+                    {% set total_p = namespace(value=0) %}
+                    {% set total_f = namespace(value=0) %}
+                    {% set total_c = namespace(value=0) %}
+
+                    {% for dish in best_menu %}
+                        {% set total_kcal.value = total_kcal.value + dish.total_calories %}
+                        {% set total_p.value = total_p.value + dish.total_protein %}
+                        {% set total_f.value = total_f.value + dish.total_fat %}
+                        {% set total_c.value = total_c.value + dish.total_carbs %}
+
+                        <tr>
+                            <td>
+    <strong>{{ dish.name }}</strong>
+
+    {% if dish_reasons and dish.id in dish_reasons %}
+        <div class="dish-reason">
+            Рекомендовано: {{ dish_reasons[dish.id] | join(', ') }}.
+        </div>
+    {% endif %}
+</td>
+                            <td>{{ dish.total_calories }}</td>
+                            <td>{{ dish.total_protein }}</td>
+                            <td>{{ dish.total_fat }}</td>
+                            <td>{{ dish.total_carbs }}</td>
+                        </tr>
+                    {% endfor %}
+
+                    <tr>
+                        <td>Сума</td>
+                        <td>{{ total_kcal.value | round(1) }}</td>
+                        <td>{{ total_p.value | round(1) }}</td>
+                        <td>{{ total_f.value | round(1) }}</td>
+                        <td>{{ total_c.value | round(1) }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="empty-message">
+                    Не вдалося згенерувати меню. Переконайся, що в базі є достатньо страв, які не містять продуктів з твого списку обмежень.
+                </p>
+            {% endif %}
+        </section>
+    {% else %}
+        <div class="alert alert-success">
+            Для точного розрахунку раціону заповни фізичні параметри та харчові вподобання.
+        </div>
+    {% endif %}
+
+    <section class="card">
+        {% if user_details %}
+            <details open>
+                <summary>Змінити параметри профілю</summary>
+        {% endif %}
+
+        <form action="{{ url_for('auth.update_profile') }}" method="POST" class="settings-form">
+
+            <fieldset>
+                <legend>Базові параметри</legend>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Стать</label>
+                        <div class="radio-group">
+                            <label>
+                                <input type="radio" name="sex" value="male" required {% if not user_details or user_details.sex == 'male' %}checked{% endif %}>
+                                Чоловіча
+                            </label>
+                            <label>
+                                <input type="radio" name="sex" value="female" required {% if user_details and user_details.sex == 'female' %}checked{% endif %}>
+                                Жіноча
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="age">Вік</label>
+                        <input type="number" id="age" name="age" min="10" max="120" required placeholder="Наприклад: 20" value="{{ user_details.age if user_details else '' }}">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="weight">Вага, кг</label>
+                        <input type="number" id="weight" name="weight" step="0.1" min="30" max="300" required placeholder="Наприклад: 60.5" value="{{ user_details.weight if user_details else '' }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="height">Зріст, см</label>
+                        <input type="number" id="height" name="height" step="1" min="100" max="250" required placeholder="Наприклад: 170" value="{{ user_details.height if user_details else '' }}">
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>Стиль життя</legend>
+
+                <div class="form-group">
+                    <label for="activity_level">Рівень фізичної активності</label>
+                    <select id="activity_level" name="activity_level" required>
+                        <option value="1.2" {% if user_details and user_details.activity_level == 1.2 %}selected{% endif %}>Сидячий — мінімум руху</option>
+                        <option value="1.375" {% if user_details and user_details.activity_level == 1.375 %}selected{% endif %}>Легкий — тренування 1–3 рази на тиждень</option>
+                        <option value="1.55" {% if user_details and user_details.activity_level == 1.55 %}selected{% endif %}>Середній — тренування 3–5 разів на тиждень</option>
+                        <option value="1.725" {% if user_details and user_details.activity_level == 1.725 %}selected{% endif %}>Високий — активні тренування 6–7 разів на тиждень</option>
+                        <option value="1.9" {% if user_details and user_details.activity_level == 1.9 %}selected{% endif %}>Дуже високий — важка фізична робота або спорт</option>
+                    </select>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>Відомі дефіцити</legend>
+                <p class="hint">
+                    Познач нутрієнти, які потрібно підвищити в раціоні. Надалі алгоритм буде враховувати ці значення під час підбору продуктів і страв.
+                </p>
+
+                <div class="option-grid">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="def_vit_a" name="def_vit_a" value="1" {% if user_details and user_details.def_vit_a %}checked{% endif %}>
+                        <label for="def_vit_a">Вітамін A</label>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="def_vit_c" name="def_vit_c" value="1" {% if user_details and user_details.def_vit_c %}checked{% endif %}>
+                        <label for="def_vit_c">Вітамін C</label>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="def_vit_d" name="def_vit_d" value="1" {% if user_details and user_details.def_vit_d %}checked{% endif %}>
+                        <label for="def_vit_d">Вітамін D</label>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="def_vit_e" name="def_vit_e" value="1">
+                        <label for="def_vit_e">Вітамін E</label>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="def_vit_k" name="def_vit_k" value="1">
+                        <label for="def_vit_k">Вітамін K</label>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="def_vit_b1" name="def_vit_b1" value="1">
+                        <label for="def_vit_b1">Вітамін B1</label>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="def_vit_b2" name="def_vit_b2" value="1">
+                        <label for="def_vit_b2">Вітамін B2</label>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="def_vit_b6" name="def_vit_b6" value="1">
+                        <label for="def_vit_b6">Вітамін B6</label>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="def_vit_b12" name="def_vit_b12" value="1">
+                        <label for="def_vit_b12">Вітамін B12</label>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="def_iron" name="def_iron" value="1" {% if user_details and user_details.def_iron %}checked{% endif %}>
+                        <label for="def_iron">Залізо</label>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="def_calcium" name="def_calcium" value="1">
+                        <label for="def_calcium">Кальцій</label>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="def_magnesium" name="def_magnesium" value="1">
+                        <label for="def_magnesium">Магній</label>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="def_zinc" name="def_zinc" value="1">
+                        <label for="def_zinc">Цинк</label>
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>Небажані продукти</legend>
+                <p class="hint">
+                    Обери продукти, які ти не вживаєш. Алгоритм не буде пропонувати страви, що містять ці інгредієнти.
+                </p>
+
+                <div class="option-grid">
+                    {% for product in all_products %}
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="prod_{{ product.id }}" name="dislikes" value="{{ product.id }}"
+                                   {% if product.id in user_dislikes %}checked{% endif %}>
+                            <label for="prod_{{ product.id }}">{{ product.name }}</label>
+                        </div>
+                    {% endfor %}
+                </div>
+            </fieldset>
+
+            <button type="submit" class="btn-submit">Зберегти та розрахувати раціон</button>
+        </form>
+
+        {% if user_details %}
+            </details>
+        {% endif %}
+    </section>
+
+    <nav class="logout">
+        <a href="{{ url_for('auth.logout') }}">Вийти з облікового запису</a>
+    </nav>
+
+</main>
+</body>
+</html>

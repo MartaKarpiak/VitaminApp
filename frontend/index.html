@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vitamin App — Головна</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: linear-gradient(135deg, #e8fff3, #eef5ff);
+            color: #0f172a;
+            min-height: 100vh;
+        }
+
+        .landing-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+        }
+
+        .landing-card {
+            width: 100%;
+            max-width: 1100px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 34px;
+            padding: 55px;
+            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.12);
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 10px 16px;
+            border-radius: 999px;
+            background: #dcfce7;
+            color: #166534;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 54px;
+            line-height: 1.05;
+            margin: 0 0 20px;
+        }
+
+        h1 span {
+            color: #10b981;
+        }
+
+        .description {
+            font-size: 19px;
+            color: #475569;
+            max-width: 620px;
+            line-height: 1.7;
+            margin-bottom: 32px;
+        }
+
+        .landing-actions {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 26px;
+            border-radius: 16px;
+            text-decoration: none;
+            font-weight: 800;
+            transition: 0.2s ease;
+        }
+
+        .btn-main {
+            background: linear-gradient(135deg, #16a34a, #0d9488);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #0f766e;
+            border: 1px solid #99f6e4;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 28px rgba(13, 148, 136, 0.18);
+        }
+
+        .features {
+            display: grid;
+            gap: 16px;
+        }
+
+        .feature-card {
+            background: #f8fafc;
+            padding: 18px;
+            border-radius: 22px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .feature-card strong {
+            display: block;
+            color: #059669;
+            margin-bottom: 6px;
+            font-size: 18px;
+        }
+
+        .feature-card p {
+            margin: 0;
+            color: #64748b;
+        }
+
+        footer {
+            margin-top: 35px;
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        @media (max-width: 850px) {
+            .landing-card {
+                grid-template-columns: 1fr;
+                padding: 35px;
+            }
+
+            h1 {
+                font-size: 40px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<main class="landing-container">
+    <section class="landing-card">
+        <div>
+            <div class="badge">Персональний підбір харчування</div>
+
+            <h1>Ласкаво просимо в <span>Vitamin App</span></h1>
+
+            <p class="description">
+                Сервіс допомагає підібрати продукти та страви відповідно до потреб організму:
+                калорій, БЖВ, вітамінів, мінералів і харчових вподобань.
+            </p>
+
+            <nav class="landing-actions">
+                <a href="{{ url_for('auth.login') }}" class="btn btn-main">Увійти</a>
+                <a href="{{ url_for('auth.register') }}" class="btn btn-secondary">Створити акаунт</a>
+            </nav>
+
+            <footer>
+                &copy; 2026 Vitamin App Team. Усі права захищені.
+            </footer>
+        </div>
+
+        <div class="features">
+            <div class="feature-card">
+                <strong>Вітаміни та мінерали</strong>
+                <p>Врахування дефіцитів і добових норм нутрієнтів.</p>
+            </div>
+
+            <div class="feature-card">
+                <strong>Персональний раціон</strong>
+                <p>Генерація меню з урахуванням калорій і БЖВ.</p>
+            </div>
+
+            <div class="feature-card">
+                <strong>Харчові вподобання</strong>
+                <p>Можливість виключати небажані продукти.</p>
+            </div>
+        </div>
+    </section>
+</main>
+</body>
+</html>
