@@ -250,7 +250,7 @@ def dashboard() -> str | Response:
                 best_menu = find_best_menu(targets, allowed_dishes)
 
                 if best_menu:
-                    for dish in best_menu:
+                    for dish in best_menu.values():
                         reasons = []
 
                         if dish.vit_a_total >= targets["micronutrients"]["vit_a_mcg"] * 0.2:

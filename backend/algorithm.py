@@ -88,12 +88,14 @@ def calculate_daily_targets(user_id: int) -> Dict[str, Any]:
     tdee = bmr * user_info.activity_level
 
     # ===== 2. РОЗРАХУНОК БЖВ =====
+    # Використовуємо стандартний розподіл калорій:
+    # білки — 20%, жири — 30%, вуглеводи — 50%.
     # 1 г білка = 4 ккал
     # 1 г жиру = 9 ккал
     # 1 г вуглеводів = 4 ккал
-    # Пропорція маси: 1 : 1 : 4
-    # 4x + 9x + 4*(4x) = 29x
-    x = tdee / 29.0
+    protein_g = (tdee * 0.20) / 4
+    fat_g = (tdee * 0.30) / 9
+    carbs_g = (tdee * 0.50) / 4
 
     # ===== 3. БАЗОВІ НОРМИ МІКРОНУТРІЄНТІВ =====
     # Беремо добові норми залежно від статі користувача
@@ -129,14 +131,15 @@ def calculate_daily_targets(user_id: int) -> Dict[str, Any]:
 
     return {
         "tdee_kcal": round(tdee, 2),
+
         "macros": {
-            "protein_g": round(x, 2),
-            "fat_g": round(x, 2),
-            "carbs_g": round(4 * x, 2)
+            "protein_g": round(protein_g, 2),
+            "fat_g": round(fat_g, 2),
+            "carbs_g": round(carbs_g, 2)
         },
+
         "micronutrients": target_micronutrients
     }
-
 
 def get_allowed_dishes(user_id: int) -> List[Dish]:
     """
@@ -158,38 +161,93 @@ def get_allowed_dishes(user_id: int) -> List[Dish]:
     return allowed_dishes
 
 
-def find_best_menu(targets: Dict[str, Any], allowed_dishes: List[Dish]) -> Optional[Tuple[Dish, ...]]:
+def find_best_menu(targets: Dict[str, Any], allowed_dishes: List[Dish]) -> Optional[Dict[str, Dish]]:
     """
-    Виконує пошук оптимальної комбінації з 3 страв.
+    Виконує пошук оптимального денного меню.
 
-    Алгоритм перебирає всі можливі комбінації по 3 страви
-    та обирає ту, яка найкраще наближена до цільових БЖВ і калорій.
+    Алгоритм:
+    1. Перебирає всі можливі комбінації з 3 страв.
+    2. Обчислює сумарні калорії, БЖВ та мікронутрієнти.
+    3. Порівнює результат із цільовими показниками користувача.
+    4. Обирає меню з найменшим штрафом.
+    5. Повертає меню у форматі:
+       - сніданок
+       - обід
+       - вечеря
     """
 
     best_menu = None
     lowest_penalty = float("inf")
 
-    # Перебір усіх комбінацій по 3 страви
-    for combo in itertools.combinations(allowed_dishes, 3):
-        current_p = sum(d.total_protein for d in combo)
-        current_f = sum(d.total_fat for d in combo)
-        current_c = sum(d.total_carbs for d in combo)
-        current_kcal = sum(d.total_calories for d in combo)
+    micronutrient_fields = {
+        "vit_a_mcg": "vit_a_total",
+        "vit_c_mg": "vit_c_total",
+        "vit_d_mcg": "vit_d_total",
+        "vit_e_mg": "vit_e_total",
+        "vit_k_mcg": "vit_k_total",
+        "vit_b1_mg": "vit_b1_total",
+        "vit_b2_mg": "vit_b2_total",
+        "vit_b6_mg": "vit_b6_total",
+        "vit_b12_mcg": "vit_b12_total",
+        "iron_mg": "iron_total",
+        "calcium_mg": "calcium_total",
+        "magnesium_mg": "magnesium_total",
+        "zinc_mg": "zinc_total",
+    }
 
-        # Функція штрафу: чим більше відхилення від цілей, тим гірша комбінація
+    for combo in itertools.combinations(allowed_dishes, 3):
+
+        # ===== 1. СУМАРНІ КАЛОРІЇ ТА БЖВ =====
+        total_protein = sum(d.total_protein for d in combo)
+        total_fat = sum(d.total_fat for d in combo)
+        total_carbs = sum(d.total_carbs for d in combo)
+        total_kcal = sum(d.total_calories for d in combo)
+
+        # ===== 2. ШТРАФ ЗА БЖВ =====
         penalty = (
-            abs(targets["macros"]["protein_g"] - current_p) +
-            abs(targets["macros"]["fat_g"] - current_f) +
-            abs(targets["macros"]["carbs_g"] - current_c)
+            abs(targets["macros"]["protein_g"] - total_protein) * 2 +
+            abs(targets["macros"]["fat_g"] - total_fat) * 2 +
+            abs(targets["macros"]["carbs_g"] - total_carbs)
         )
 
-        # Якщо калорійність сильно відрізняється від цілі — додаємо великий штраф
-        if abs(targets["tdee_kcal"] - current_kcal) > targets["tdee_kcal"] * 0.1:
+        # ===== 3. ШТРАФ ЗА КАЛОРІЇ =====
+        kcal_difference = abs(targets["tdee_kcal"] - total_kcal)
+
+        # Калорії дуже важливі, тому їх враховуємо окремо
+        penalty += kcal_difference * 0.5
+
+        # Якщо відхилення більше 15%, додаємо додатковий штраф
+        if kcal_difference > targets["tdee_kcal"] * 0.15:
             penalty += 500
 
-        # Запам'ятовуємо найкращу комбінацію
+        # ===== 4. ШТРАФ ЗА МІКРОНУТРІЄНТИ =====
+        for target_field, dish_field in micronutrient_fields.items():
+
+            target_value = targets["micronutrients"][target_field]
+
+            menu_value = sum(
+                getattr(dish, dish_field, 0) or 0
+                for dish in combo
+            )
+
+            # Якщо меню не добирає нутрієнт — додаємо штраф
+            if menu_value < target_value:
+                deficit = target_value - menu_value
+
+                # Нормалізуємо, щоб великі значення типу кальцію
+                # не ламали весь розрахунок
+                penalty += (deficit / target_value) * 120
+
+        # ===== 5. ЗБЕРІГАЄМО НАЙКРАЩУ КОМБІНАЦІЮ =====
         if penalty < lowest_penalty:
             lowest_penalty = penalty
-            best_menu = combo
+
+            sorted_combo = sorted(combo, key=lambda d: d.total_calories)
+
+            best_menu = {
+                "breakfast": sorted_combo[0],
+                "lunch": sorted_combo[2],
+                "dinner": sorted_combo[1]
+            }
 
     return best_menu
