@@ -20,9 +20,13 @@ db_user = os.getenv('DB_USER')
 db_pass = os.getenv('DB_PASSWORD')
 db_host = os.getenv('DB_HOST')
 db_name = os.getenv('DB_NAME')
+
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
-app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://{db_user}:{db_pass}@{db_host}/{db_name}'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+if os.getenv("GITHUB_ACTIONS") == "true":
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+else:
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://{db_user}:{db_pass}@{db_host}/{db_name}'
 
 
 @app.route('/')
