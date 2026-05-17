@@ -251,3 +251,36 @@ def find_best_menu(targets: Dict[str, Any], allowed_dishes: List[Dish]) -> Optio
             }
 
     return best_menu
+
+def calculate_ai_dish_nutrition(ai_dish, all_products):
+
+    total_calories = 0
+    total_protein = 0
+    total_fat = 0
+    total_carbs = 0
+
+    for ingredient_name in ai_dish["ingredients"]:
+
+        matching_product = next(
+            (
+                p for p in all_products
+                if p.name.lower() == ingredient_name.lower()
+            ),
+            None
+        )
+
+        if matching_product:
+
+            total_calories += matching_product.calories_100g
+            total_protein += matching_product.protein_100g
+            total_fat += matching_product.fat_100g
+            total_carbs += matching_product.carbs_100g
+
+    return {
+        "name": ai_dish["name"],
+        "ingredients": ai_dish["ingredients"],
+        "calories": round(total_calories, 2),
+        "protein": round(total_protein, 2),
+        "fat": round(total_fat, 2),
+        "carbs": round(total_carbs, 2)
+    }

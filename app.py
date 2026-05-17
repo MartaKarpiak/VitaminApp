@@ -2,10 +2,12 @@ import os
 from flask import Flask, render_template, session, request, redirect, url_for, flash
 from dotenv import load_dotenv
 from backend.models import db, User, UserDetails
-# Імпортуємо об'єкт БД з нашого пакету backend
 from backend.models import db
-# Імпортуємо маршрути авторизації
 from backend.auth import auth_bp
+from backend.algorithm import calculate_ai_dish_nutrition
+from backend.ai_generator import generate_ai_dishes
+from backend.models import Product
+from flask_migrate import Migrate
 
 # 1. Завантаження .env тепер просте, бо файли лежать поруч
 load_dotenv()
@@ -27,9 +29,42 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 def index():
     return render_template('index.html')
 
+@app.route('/generate-ai-dishes')
+def generate_ai_dishes_route():
+
+    products = [
+        "Куряче філе",
+        "Рис бурий",
+        "Броколі",
+        "Яйце куряче"
+    ]
+
+    goal = "high protein and vitamin D"
+
+    ai_dishes = generate_ai_dishes(products, goal)
+
+    all_products = Product.query.all()
+
+    calculated_dishes = []
+
+    for dish in ai_dishes:
+
+        nutrition = calculate_ai_dish_nutrition(
+            dish,
+            all_products
+        )
+
+        calculated_dishes.append(nutrition)
+
+    return render_template(
+        'ai_dishes.html',
+        dishes=calculated_dishes
+    )
+
 
 # 4. Прив'язка бази даних до нашого Flask-додатку
 db.init_app(app)
+migrate = Migrate(app, db)
 
 # 5. Реєстрація Blueprint (підключення маршрутів з auth.py)
 app.register_blueprint(auth_bp)
@@ -37,6 +72,7 @@ app.register_blueprint(auth_bp)
 # 6. Створення таблиць у базі (якщо їх ще немає)
 with app.app_context():
     db.create_all()
+
 
 if __name__ == '__main__':
     # Запуск сервера

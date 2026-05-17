@@ -606,8 +606,9 @@
         {% set total_p = namespace(value=0) %}
         {% set total_f = namespace(value=0) %}
         {% set total_c = namespace(value=0) %}
+        {% for meal_type in ['breakfast', 'lunch', 'dinner'] %}
 
-        {% for meal_type, dish in best_menu.items() %}
+        {% set dish = best_menu[meal_type] %}
             {% set total_kcal.value = total_kcal.value + dish.total_calories %}
             {% set total_p.value = total_p.value + dish.total_protein %}
             {% set total_f.value = total_f.value + dish.total_fat %}
@@ -625,63 +626,109 @@
                         {% endif %}
 
                         <strong>{{ dish.name }}</strong>
+                        <button onclick="regenerateMeal('{{ meal_type }}', this)" style="
+                                margin-left:10px;
+                                background:#14b8a6;
+                                color:white;
+                                border:none;
+                                padding:6px 12px;
+                                border-radius:10px;
+                                cursor:pointer;
+                                font-weight:bold;
+                            ">
+                            Змінити AI
+                        </button>
+                        
+                        </form>
                     </div>
+                    {% if dish.ingredients %}
+                    
+                    <div style="margin-top:10px;">
+                    
+                        {% for ingredient in dish.ingredients %}
+                    
+                        <div style="
+                                background:#eefaf5;
+                                display:inline-block;
+                                padding:8px 14px;
+                                border-radius:20px;
+                                margin:4px;
+                                font-size:15px;
+                                color:#0b6b57;
+                                border:1px solid #9be3cf;
+                            ">
+                    
+                            {{ ingredient.name }} — {{ ingredient.grams }} г
+                    
+                        </div>
+                    
+                        {% endfor %}
+                    
+                    </div>
+                    
+                    {% endif %}
+                    {% if dish.recipe %}
+                    
+                    <div style="
+                        margin-top:15px;
+                        background:#f8fffc;
+                        padding:14px;
+                        border-radius:14px;
+                        color:#14532d;
+                        border:1px solid #bbf7d0;
+                        max-width:700px;
+                    ">
+                    
+                        <strong>Рецепт:</strong><br>
+                    
+                        {{ dish.recipe }}
+                    
+                    </div>
+                    
+                    {% endif %}
 
-                    {% if dish_reasons and dish.id in dish_reasons %}
-    <div class="reason-badges">
 
-        {% for reason in dish_reasons[dish.id] %}
+            </td>
 
-            {% set reason_text = reason|string %}
-
-            {% if "вітамін D" in reason_text %}
-                <span class="reason-badge vitamin-d">
-                    ☀️ Вітамін D
-                </span>
-
-            {% elif "вітамін B12" in reason_text %}
-                <span class="reason-badge vitamin-b12">
-                    🧠 B12
-                </span>
-
-            {% elif "залізо" in reason_text %}
-                <span class="reason-badge iron">
-                    🩸 Залізо
-                </span>
-
-            {% elif "магній" in reason_text %}
-                <span class="reason-badge magnesium">
-                    ⚡ Магній
-                </span>
-
-            {% elif "цинк" in reason_text %}
-                <span class="reason-badge zinc">
-                    🛡️ Цинк
-                </span>
-
-            {% elif "білок" in reason_text %}
-                <span class="reason-badge protein">
-                    💪 Білок
-                </span>
-
-            {% else %}
-                <span class="reason-badge">
-                    {{ reason_text }}
-                </span>
-
-            {% endif %}
-
-        {% endfor %}
-
-    </div>
-{% endif %}
-
+                <td>
+                    {% if dish.total_calories is defined %}
+                    {{ dish.total_calories }}
+                    {% elif dish.calories is defined %}
+                    {{ dish.calories }}
+                    {% else %}
+                    —
+                    {% endif %}
                 </td>
 
-                <td>{{ dish.total_calories }}</td>
-                <td>{{ dish.total_protein }}</td>
-                <td>{{ dish.total_fat }}</td>
-                <td>{{ dish.total_carbs }}</td>
+                <td>
+                    {% if dish.total_protein is defined %}
+                    {{ dish.total_protein }}
+                    {% elif dish.protein is defined %}
+                    {{ dish.protein }}
+                    {% else %}
+                    —
+                    {% endif %}
+                </td>
+
+                <td>
+                    {% if dish.total_fat is defined %}
+                    {{ dish.total_fat }}
+                    {% elif dish.fat is defined %}
+                    {{ dish.fat }}
+                    {% else %}
+                    —
+                    {% endif %}
+                </td>
+
+                <td>
+                    {% if dish.total_carbs is defined %}
+                    {{ dish.total_carbs }}
+                    {% elif dish.carbs is defined %}
+                    {{ dish.carbs }}
+                    {% else %}
+                    —
+                    {% endif %}
+                </td>
             </tr>
         {% endfor %}
 
@@ -893,6 +940,43 @@
         <a href="{{ url_for('auth.logout') }}">Вийти з облікового запису</a>
     </nav>
 
+    <div class="card" style="margin-top:30px;">
+        <h2>AI Помічник</h2>
+    
+        <div id="chatBox" style="
+            height:300px;
+            overflow-y:auto;
+            border:1px solid #dbeafe;
+            border-radius:18px;
+            padding:15px;
+            background:#f8fafc;
+            margin-bottom:15px;
+        ">
+        </div>
+    
+        <div style="display:flex; gap:10px;">
+            <input type="text" id="chatInput" placeholder="Напиши питання про харчування..." style="
+                    flex:1;
+                    padding:14px;
+                    border-radius:14px;
+                    border:1px solid #cbd5e1;
+                    font-size:15px;
+                ">
+    
+            <button onclick="sendMessage()" style="
+                    background:#10b981;
+                    color:white;
+                    border:none;
+                    padding:14px 20px;
+                    border-radius:14px;
+                    cursor:pointer;
+                    font-weight:bold;
+                ">
+                Надіслати
+            </button>
+        </div>
+    </div>
+
 </main>
 <script>
     const searchInput = document.getElementById("productSearch");
@@ -945,6 +1029,89 @@
             }
         });
     }
+</script>
+<script>
+
+    async function sendMessage() {
+
+        const input = document.getElementById("chatInput");
+        const chatBox = document.getElementById("chatBox");
+
+        const message = input.value.trim();
+
+        if (!message) return;
+
+        chatBox.innerHTML += `
+        <div style="margin-bottom:12px;">
+            <strong>Ти:</strong><br>
+            ${message}
+        </div>
+    `;
+
+        input.value = "";
+
+        const response = await fetch("/chat", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                message: message
+            })
+        });
+
+        const data = await response.json();
+
+        chatBox.innerHTML += `
+        <div style="
+            margin-bottom:16px;
+            background:#ecfdf5;
+            padding:12px;
+            border-radius:14px;
+        ">
+            <strong>AI Assistant:</strong><br>
+            ${data.reply}
+        </div>
+    `;
+
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+</script>
+<script>
+
+    async function regenerateMeal(mealType, button) {
+
+        const originalText = button.innerText;
+
+        button.disabled = true;
+        button.innerText = "Генерується...";
+
+        const response = await fetch("/regenerate-meal", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                meal_type: mealType
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+
+            location.reload();
+
+        } else {
+
+            alert("Помилка генерації");
+
+            button.disabled = false;
+            button.innerText = originalText;
+        }
+    }
+
 </script>
 </body>
 </html>

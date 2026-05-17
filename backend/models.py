@@ -119,11 +119,22 @@ class Dish(db.Model):
     magnesium_total = db.Column(db.Float, default=0)
     zinc_total = db.Column(db.Float, default=0)
 
+    ingredients_text = db.Column(db.Text)
+
+    recipe = db.Column(db.Text)
+    ingredients = db.relationship(
+        'DishIngredient',
+        backref='dish',
+        lazy=True,
+        cascade='all, delete-orphan'
+    )
+
 class DishIngredient(db.Model):
     __tablename__ = 'dish_ingredients'
     dish_id = db.Column(db.Integer, db.ForeignKey('dishes.id', ondelete='CASCADE'), primary_key=True)
     product_id = db.Column(db.Integer, db.ForeignKey('products.id', ondelete='CASCADE'), primary_key=True)
     weight_g = db.Column(db.Float, nullable=False)
+    product = db.relationship('Product')
 
 class UserDislike(db.Model):
     __tablename__ = 'user_dislikes'
