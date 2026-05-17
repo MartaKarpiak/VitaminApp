@@ -5,11 +5,12 @@ from openai import OpenAI
 
 load_dotenv()
 
-client = OpenAI(
-    api_key=os.getenv("OPENAI_API_KEY")
-)
 
 def generate_ai_dishes(products, goal, dislikes):
+
+    client = OpenAI(
+            api_key=os.getenv("OPENAI_API_KEY")
+        )
 
     prompt = f"""
     Створи 3 корисні страви ВИКЛЮЧНО з цих продуктів:
