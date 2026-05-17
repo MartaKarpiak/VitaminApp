@@ -27,7 +27,8 @@ if os.getenv("GITHUB_ACTIONS") == "true":
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
 else:
     app.config['SQLALCHEMY_DATABASE_URI'] = (
-        f'mysql+pymysql://{db_user}:{db_pass}@{db_host}/{db_name}?ssl_disabled=false'
+        f'mysql+pymysql://{db_user}:{db_pass}@{db_host}/{db_name}'
+        '?ssl_ca=/etc/ssl/certs/ca-certificates.crt'
     )
 
 
