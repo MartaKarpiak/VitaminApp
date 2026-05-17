@@ -17,9 +17,6 @@ from backend.mailer import send_reset_email
 from backend.models import Dish
 from backend.ai_generator import generate_ai_dishes
 
-client = OpenAI(
-    api_key=os.getenv("OPENAI_API_KEY")
-)
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -654,6 +651,9 @@ def chat():
 
     Give short, useful, personalized nutrition advice.
     """
+    client = OpenAI(
+        api_key=os.getenv("OPENAI_API_KEY")
+    )
 
     response = client.chat.completions.create(
         model="gpt-4.1-mini",
