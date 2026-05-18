@@ -8,6 +8,7 @@ from backend.algorithm import calculate_ai_dish_nutrition
 from backend.ai_generator import generate_ai_dishes
 from backend.models import Product
 from flask_migrate import Migrate
+from backend.ai_generator import generate_ai_dishes
 
 # 1. Завантаження .env тепер просте, бо файли лежать поруч
 load_dotenv()
@@ -27,12 +28,14 @@ if os.getenv("GITHUB_ACTIONS") == "true":
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
 else:
     app.config['SQLALCHEMY_DATABASE_URI'] = (
-        f'mysql+pymysql://{db_user}:{db_pass}@{db_host}/{db_name}'
+        f'mysql+pymysql://{db_user}:{db_pass}@{db_host}/{db_name}?ssl_verify_cert=false'
     )
 
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
         "connect_args": {
-            "ssl": {}
+            "ssl": {
+                "ssl_disabled": False
+            }
         }
     }
 
