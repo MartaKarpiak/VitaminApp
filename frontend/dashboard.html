@@ -980,11 +980,17 @@
 
     if (toggleBtn && productList) {
         toggleBtn.addEventListener("click", function () {
-            productList.classList.toggle("show");
 
-            toggleBtn.textContent = productList.classList.contains("show")
-                ? "Сховати список продуктів"
-                : "Показати всі продукти";
+            const isVisible =
+                window.getComputedStyle(productList).display !== "none";
+
+            if (isVisible) {
+                productList.style.display = "none";
+                toggleBtn.textContent = "Показати всі продукти";
+            } else {
+                productList.style.display = "grid";
+                toggleBtn.textContent = "Сховати список продуктів";
+            }
         });
     }
 
@@ -994,7 +1000,7 @@
             let visibleCount = 0;
 
             if (searchValue !== "") {
-                productList.classList.add("show");
+                productList.style.display = "grid";
                 if (toggleBtn) {
                     toggleBtn.textContent = "Сховати список продуктів";
                 }
