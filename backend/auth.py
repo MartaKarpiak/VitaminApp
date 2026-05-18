@@ -468,17 +468,17 @@ def dashboard() -> str | Response:
 
         session.pop('regenerated_meal', None)
 
-        return render_template(
-        'dashboard.html',
-        user=user,
-        user_details=user_details,
-        targets=targets,
-        best_menu=best_menu,
-        all_products=all_products,
-        user_dislikes=user_dislikes,
-        dish_reasons=dish_reasons,
-        product_recommendations=product_recommendations
-    )
+    return render_template(
+            'dashboard.html',
+            user=user,
+            user_details=user_details,
+            targets=targets,
+            best_menu=best_menu,
+            all_products=all_products,
+            user_dislikes=user_dislikes,
+            dish_reasons=dish_reasons,
+            product_recommendations=product_recommendations
+        )
 
 
 @auth_bp.route('/update-profile', methods=['POST'])
